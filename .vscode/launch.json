@@ -1,0 +1,24 @@
+{
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Spring Boot-EcomInventoryServiceApplication<ecom-inventory-service>",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "org.codesnippet.ecominventoryservice.EcomInventoryServiceApplication",
+      "projectName": "ecom-inventory-service",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Spring Boot-EcomOrderServiceApplication<ecom-order-service>",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "org.codesnippet.ecomorderservice.EcomOrderServiceApplication",
+      "projectName": "ecom-order-service",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env"
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 package org.codesnippet.ecomorderservice.services;
 
+import org.codesnippet.ecomorderservice.client.InventoryClient;
 import org.codesnippet.ecomorderservice.dto.Inventory;
 import org.codesnippet.ecomorderservice.exceptions.MyCustomRuntimeException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +14,11 @@ import java.io.InputStream;
 
 @Service
 public class OrderService {
-
+    private final InventoryClient inventoryClient;
     private  final RestTemplate restTemplate;
     private final RestClient restClient;
-    public OrderService(RestTemplate restTemplate, RestClient restClient) {
+    public OrderService(InventoryClient inventoryClient, RestTemplate restTemplate, RestClient restClient) {
+        this.inventoryClient = inventoryClient;
         this.restTemplate = restTemplate;
         this.restClient = restClient;
     }
@@ -37,13 +39,15 @@ public class OrderService {
                 .toEntity(Inventory.class);
         */
         // onStatus Example
-        ResponseEntity<Inventory> entity = restClient.get()
-                .uri("http://localhost:8081/inventory/{productId}", productId)
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError,((request, response) ->{
-                    throw new MyCustomRuntimeException(response.getStatusCode(),response.getHeaders());
-                } ))
-                .toEntity(Inventory.class);
+        // ResponseEntity<Inventory> entity = restClient.get()
+        //         .uri("http://localhost:8081/inventory/{productId}", productId)
+        //         .retrieve()
+        //         .onStatus(HttpStatusCode::is4xxClientError,((request, response) ->{
+        //             throw new MyCustomRuntimeException(response.getStatusCode(),response.getHeaders());
+        //         } ))
+        //         .toEntity(Inventory.class);
+
+        Inventory inventory =  inventoryClient.getInventory(productId);
 
      /*
      // Exchange Example For Demo
@@ -59,20 +63,24 @@ public class OrderService {
                 }));*/
 
 
-        updateInventory(entity.getBody());
+        // updateInventory(entity.getBody());
+        updateInventory(inventory);
 
-        return  entity.getBody()!=null && entity.getBody().getQuantity()>0?
+        /*return  inventory.getBody()!=null && inventory.getBody().getQuantity()>0?
               "Order Placed Successfully":
-              "Product Out Of Stock";
+              "Product Out Of Stock";*/
+        return inventory.getQuantity() > 0 ? "Order Placed Successfully" : "Product Out Of Stock";
     }
 
     private void updateInventory(Inventory inventory) {
         inventory.setQuantity(inventory.getQuantity()-1);
-        restClient.post()
+        /*restClient.post()
                 .uri("http://localhost:8081/inventory")
                 .body(inventory)
                 .retrieve()
                 .toBodilessEntity();
+        */
+       inventoryClient.updateInventory(inventory);
     }
 
 
